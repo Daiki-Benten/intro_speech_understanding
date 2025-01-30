@@ -14,8 +14,9 @@ def voiced_excitation(duration, F0, Fs):
       excitation[n] = -1 if n is an integer multiple of int(np.round(Fs/F0))
       excitation[n] = 0 otherwise
     '''
-    excitation = np.zeros(duration) 
-    pass # change this
+    excitation = np.zeros(duration)  
+    step = int(np.round(Fs / F0))  
+    excitation[::step] = -1  
     return excitation
 
 def resonator(x, F, BW, Fs):
@@ -32,7 +33,10 @@ def resonator(x, F, BW, Fs):
     y (np.ndarray(N)) - resonant output
     '''
     y = np.zeros(len(x)) 
-    pass # change this
+    r = np.exp(-np.pi * BW / Fs)  
+    theta = 2 * np.pi * F / Fs  
+    b = [1]  
+    a = [1, -2 * r * np.cos(theta), r**2]
     return y
 
 def synthesize_vowel(duration,F0,F1,F2,F3,F4,BW1,BW2,BW3,BW4,Fs):
@@ -55,6 +59,11 @@ def synthesize_vowel(duration,F0,F1,F2,F3,F4,BW1,BW2,BW3,BW4,Fs):
     @returns:
     speech (np.ndarray(samples)) - synthesized vowel
     '''
-    speech = np.zeros(duration) # change this
-    return speech
+    excitation = voiced_excitation(duration, F0, Fs)  
+
+    y1 = resonator(excitation, F1, BW1, Fs)
+    y2 = resonator(y1, F2, BW2, Fs)
+    y3 = resonator(y2, F3, BW3, Fs)
+    y4 = resonator(y3, F4, BW4, Fs)
+    return y4
     
