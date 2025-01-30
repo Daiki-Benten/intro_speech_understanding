@@ -1,4 +1,4 @@
-import speech_recognition
+import speech_recognition as sr
 
 def transcribe_wavefile(filename, language='en'):
     '''
@@ -13,4 +13,19 @@ def transcribe_wavefile(filename, language='en'):
     @returns:
     text (str) - the recognized speech
     '''
-    raise RuntimeError("FAIL!!  You need to change this function so it works!")
+    recognizer = sr.Recognizer()
+    
+    try:
+        with sr.AudioFile(filename) as source:
+            audio = recognizer.record(source)  
+        text = recognizer.recognize_google(audio, language=language)
+        return text
+    
+    except sr.UnknownValueError:
+        return "Speech Recognition could not understand the audio."
+    
+    except sr.RequestError:
+        return "Could not request results from Speech Recognition service."
+
+    except FileNotFoundError:
+        return "File not found. Please check the filename."
